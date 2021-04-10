@@ -28,6 +28,13 @@ function []=match_to_a_subj(i_ref, lambda, penalty, data_path)
 %   matlab -nodisplay -nodesktop -r "match_to_a_subj(1,3e-4,'two_region', \
 %   '/Users/chang/Documents/research/brain_connectivity/data/precision/')"
 %
+% Author:      Chang Su
+% email:        c.su@yale.edu
+% Matlab ver.:  R2019b
+% Date:         10-Apr-2021
+%
+% Documentation reference: https://www.mathworks.com/matlabcentral/fileexchange/41423-documenting-help-section-of-an-m-file
+%
     arguments
         i_ref (1,1) {mustBeNumeric,mustBeReal} = 1
         lambda (1,1) {mustBeNumeric,mustBeReal} = 3e-4
