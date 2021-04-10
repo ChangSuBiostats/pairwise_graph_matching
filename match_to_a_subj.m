@@ -1,4 +1,33 @@
 function []=match_to_a_subj(i_ref, lambda, penalty, data_path)
+%DOCFUN match a selected subject to all 997 subjects 
+%
+% Perform matching with precision FC maps
+% Save the permutation matrices and relevant summary statistics
+%
+% INPUT
+%   i_ref: the selected subject, which will be matched to all 997 subjects.
+%           Default to 1.
+%   lambda: weight for the penalty. Default to 3e-4.
+%   penalty: name of the penalty matrix. Currently we support 'vanilla'
+%       (penalizing all swaps) and 'two_region' (penalizing only interactions across
+%       two hclust blocks). Default to 'two_region'.
+%   data_path: the path where the HCP precision matrices are.
+%
+% OUTPUT
+%   a matlab file at output/matching_results/, named 'P_%i.mat' % i_ref,
+%   which contains 
+%       swap_positions: (997*392*2), the coordinates in a matrix where the swaps happen
+%       sum_swaps: (392,3), the frequency table of swaps when matching to 997
+%           subjects, where the first two columns are coordinates and the
+%           thrid is frequency counts.
+%       diff: (997,2), squared F-norm of the difference between two maps before and
+%           after matching
+%       offdiag_swap_counts: (997,1), number of offdiag swaps
+%
+% Examples:
+%   matlab -nodisplay -nodesktop -r "match_to_a_subj(1,3e-4,'two_region', \
+%   '/Users/chang/Documents/research/brain_connectivity/data/precision/')"
+%
     arguments
         i_ref (1,1) {mustBeNumeric,mustBeReal} = 1
         lambda (1,1) {mustBeNumeric,mustBeReal} = 3e-4
@@ -6,16 +35,7 @@ function []=match_to_a_subj(i_ref, lambda, penalty, data_path)
         data_path (1,:) char = 'data/'
     end
     
-    fprintf('i_ref=%i, lambda=%.1e, penalty=%s, data_path=%s \n', i_ref, lambda, penalty, data_path)
-    
-    % reference: 
-    % 1. make MATLAB take arguments from command line:
-    %   https://stackoverflow.com/questions/8981168/running-a-matlab-program-with-arguments
-    % 2. set default value for parameters
-    %   https://www.mathworks.com/help/matlab/matlab_prog/function-argument-validation-1.html
-    % 3. save large sparse matrix efficiently
-    %   reference: https://www.mathworks.com/matlabcentral/answers/101798-how-can-i-write-a-sparse-matrix-s-non-zero-values-and-the-corresponding-row-and-column-information-t
-        
+    fprintf('i_ref=%i, lambda=%.1e, penalty=%s, data_path=%s \n', i_ref, lambda, penalty, data_path)    
     
     %% set up paths and directories
     % add the path where data are stored
@@ -86,3 +106,11 @@ function []=match_to_a_subj(i_ref, lambda, penalty, data_path)
     save(strcat('output/matching_results/P_', num2str(i_ref), '.mat'), 'swap_positions', 'sum_swaps', 'diff', 'offdiag_swap_counts');
 end
 
+% reference: 
+    % 1. make MATLAB take arguments from command line:
+    %   https://stackoverflow.com/questions/8981168/running-a-matlab-program-with-arguments
+    % 2. set default value for parameters
+    %   https://www.mathworks.com/help/matlab/matlab_prog/function-argument-validation-1.html
+    % 3. save large sparse matrix efficiently
+    %   reference: https://www.mathworks.com/matlabcentral/answers/101798-how-can-i-write-a-sparse-matrix-s-non-zero-values-and-the-corresponding-row-and-column-information-t
+    
