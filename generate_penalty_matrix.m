@@ -16,9 +16,10 @@ for i = 1:392
         end
     end
 end
-save('vanilla_penalty.mat', 'vanilla_p');
+save('output/vanilla_penalty.mat', 'vanilla_p');
 
 % Create two regions only penalty matrix
+addpath /Users/chang/Documents/research/brain_connectivity/code
 hc_func = load('hclust_11_functional.mat');
 two_region_p = zeros(392);
 for i = 1:392
@@ -44,4 +45,4 @@ for i = 1:392
     end
 end
 
-save('two_regions_penalty.mat', 'two_region_p');
+save('output/two_regions_penalty.mat', 'two_region_p');
