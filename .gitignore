@@ -1,0 +1,9 @@
+# results from matching
+output/matching_results
+
+# data (since it could be very large)
+data/
+
+.DS_Store
+
+.m~
