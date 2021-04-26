@@ -18,7 +18,8 @@ for i = 1:392
 end
 save('output/vanilla_penalty.mat', 'vanilla_p');
 
-% Create two regions only penalty matrix
+% Create a matrix to penalize two regions enriched for swappings 
+% given by hierarchical clustering
 hc_func = load('output/hclust_11_functional.mat');
 two_region_p = zeros(392);
 for i = 1:392
@@ -45,3 +46,16 @@ for i = 1:392
 end
 
 save('output/two_regions_penalty.mat', 'two_region_p');
+
+
+% Create a matrix to penalize swaps within and between 
+% Limbic, Subcortical, Cerebellum under Yeo mapping
+yeo_mapping = load('output/yeo_index.mat');
+
+yeo_p = zeros(392);
+% limbic: 5, Subcortical: 8, Cerebellum/Brain Stem: 9
+three_region_index = ismember(yeo_mapping.network_label, [5, 8, 9]);
+yeo_p(three_region_index, three_region_index) = 1;
+yeo_p(logical(eye(392))) = 0;
+
+save('output/yeo_penalty.mat', 'yeo_p');
