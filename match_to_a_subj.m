@@ -9,15 +9,17 @@ function []=match_to_a_subj(i_ref, lambda, penalty, data_path)
 %           Default to 1.
 %   lambda: weight for the penalty. Default to 3e-4.
 %   penalty: name of the penalty matrix. Currently we support 'vanilla'
-%       (penalizing all swaps) and 'two_region' (penalizing only interactions across
-%       two hclust blocks). Default to 'two_region'.
+%       (penalizing all swaps), 'two_region' (penalizing only interactions across
+%       two hclust blocks) and 'yeo' (penalizing blocks within and between
+%       Limbic, subcortical and cerebellum). Default to 'two_region'.
 %   data_path: the path where the HCP precision matrices are.
 %
 % OUTPUT
 %   a matlab file at output/matching_results/, named 'P_%i.mat' % i_ref,
 %   which contains 
-%       swap_positions: (997*392*2), the coordinates in a matrix where the swaps happen
-%       sum_swaps: (392,3), the frequency table of swaps when matching to 997
+%       swap_positions: (997*392*2), each row corresponds to the
+%       coordinates of the swaps
+%       sum_swaps: (392,3), the frequency of swaps when matching to 997
 %           subjects, where the first two columns are coordinates and the
 %           thrid is frequency counts.
 %       diff: (997,2), squared F-norm of the difference between two maps before and
@@ -38,7 +40,7 @@ function []=match_to_a_subj(i_ref, lambda, penalty, data_path)
     arguments
         i_ref (1,1) {mustBeNumeric,mustBeReal} = 1
         lambda (1,1) {mustBeNumeric,mustBeReal} = 3e-4
-        penalty (1,:) char {mustBeMember(penalty,{'vanilla','two_region'})} = 'two_region'
+        penalty (1,:) char {mustBeMember(penalty,{'vanilla','two_region','yeo'})} = 'yeo'
         data_path (1,:) char = 'data/'
     end
     
@@ -70,6 +72,8 @@ function []=match_to_a_subj(i_ref, lambda, penalty, data_path)
         penalty_m = load('output/vanilla_penalty.mat').vanilla_p;
     elseif strcmp(penalty, 'two_region')
         penalty_m = load('output/two_regions_penalty.mat').two_region_p;
+    elseif strcmp(penalty, 'yeo')
+        penalty_m = load('output/yeo_penalty.mat').yeo_p;
     end    
     
     % set the FC map from subj i as the reference map
@@ -110,7 +114,7 @@ function []=match_to_a_subj(i_ref, lambda, penalty, data_path)
     % the positions and values of nonzero entries
     sum_swaps = [row, col, v];
 
-    save(strcat('output/matching_results/P_', num2str(i_ref), '.mat'), 'swap_positions', 'sum_swaps', 'diff', 'offdiag_swap_counts');
+    save(strcat('output/matching_results/P_', num2str(i_ref), '_', penalty, '.mat'), 'swap_positions', 'sum_swaps', 'diff', 'offdiag_swap_counts');
 end
 
 % reference: 
