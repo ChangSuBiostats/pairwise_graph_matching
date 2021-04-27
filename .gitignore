@@ -7,3 +7,6 @@ data/
 .DS_Store
 
 .m~
+
+# sbatch job output
+*.out
