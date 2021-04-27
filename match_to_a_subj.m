@@ -1,4 +1,4 @@
-function []=match_to_a_subj(i_ref, lambda, penalty, data_path)
+function []=match_to_a_subj(i_ref, lambda, penalty, data_path, ref_popu)
 %DOCFUN match a selected subject to all 997 subjects 
 %
 % Perform matching with precision FC maps
@@ -12,7 +12,11 @@ function []=match_to_a_subj(i_ref, lambda, penalty, data_path)
 %       (penalizing all swaps), 'two_region' (penalizing only interactions across
 %       two hclust blocks) and 'yeo' (penalizing blocks within and between
 %       Limbic, subcortical and cerebellum). Default to 'two_region'.
-%   data_path: the path where the HCP precision matrices are.
+%   data_path: the path to HCP precision matrices 
+%       cc400_regFCprec_concat_hpf_997subj.mat
+%       cc400_regFCprec_concat_hpf_retest41.mat
+%   ref_popu: which population does the reference matrix come from, i.e.
+%       test or re-test. Default to test.
 %
 % OUTPUT
 %   a matlab file at output/matching_results/, named 'P_%i.mat' % i_ref,
@@ -42,9 +46,10 @@ function []=match_to_a_subj(i_ref, lambda, penalty, data_path)
         lambda (1,1) {mustBeNumeric,mustBeReal} = 3e-4
         penalty (1,:) char {mustBeMember(penalty,{'vanilla','two_region','yeo'})} = 'yeo'
         data_path (1,:) char = 'data/'
+        ref_popu (1,:) char = 'test'
     end
     
-    fprintf('i_ref=%i, lambda=%.1e, penalty=%s, data_path=%s \n', i_ref, lambda, penalty, data_path)    
+    fprintf('i_ref=%i, lambda=%.1e, penalty=%s, data_path=%s , ref_popu=%s\n', i_ref, lambda, penalty, data_path, ref_popu)    
     
     %% set up paths and directories
     % add the path where data are stored
@@ -62,7 +67,9 @@ function []=match_to_a_subj(i_ref, lambda, penalty, data_path)
     
     %% load data
     test = load('cc400_regFCprec_concat_hpf_997subj.mat');
-    % retest = load('cc400_regFCprec_concat_hpf_retest41.mat');
+    if strcmp(ref_popu, 'retest')
+        retest = load('cc400_regFCprec_concat_hpf_retest41.mat');
+    end
     n = size(test.subj, 2);
     
     %% start matching
@@ -76,8 +83,12 @@ function []=match_to_a_subj(i_ref, lambda, penalty, data_path)
         penalty_m = load('output/yeo_penalty.mat').yeo_p;
     end    
     
-    % set the FC map from subj i as the reference map
-    m_ref = squeeze(test.C(i_ref, :, :));
+    % set the FC map from subj i in ref_popu as the reference map
+    if strcmp(ref_popu, 'test')
+        m_ref = squeeze(test.C(i_ref, :, :));
+    elseif strcmp(ref_popu, 'retest')
+        m_ref = squeeze(retest.C(i_ref, :, :));
+    end
     m_ref(logical(eye(392))) = 0; % remove the effect of diagonal values
     
     % set number of iterations to 1 to save computational time
@@ -114,7 +125,7 @@ function []=match_to_a_subj(i_ref, lambda, penalty, data_path)
     % the positions and values of nonzero entries
     sum_swaps = [row, col, v];
 
-    save(strcat('output/matching_results/P_', num2str(i_ref), '_', penalty, '.mat'), 'swap_positions', 'sum_swaps', 'diff', 'offdiag_swap_counts');
+    save(strcat('output/matching_results/P_', ref_popu, '_', num2str(i_ref), '_', penalty, '.mat'), 'swap_positions', 'sum_swaps', 'diff', 'offdiag_swap_counts');
 end
 
 % reference: 
