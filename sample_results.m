@@ -1,7 +1,9 @@
 % 1. Illustration of how regular matrices can be recovered from the sparse
 % representation
 % 2. Sanity check of the permutation matrices using visualization
-%
+% 3. An example of analysis:
+%   compare the permutation results on test-retest pairs and on unrelated
+%   pairs
 
 penalty_m = load('output/yeo_penalty.mat').yeo_p;
 
@@ -52,3 +54,43 @@ plot_heatmap(P_sum(yeo_mapping.re_index, yeo_mapping.re_index), [0 1], redmap, .
 % limbic-subcortical-cerebellum region are 'muted'
 
 
+%% An example of analysis:
+% Compare the permutation results on test-retest pairs and on unrelated
+% pairs.
+% We need to have test and retest results under output/matching_results/
+% in order to run the following codes.
+
+% load how retest subjects are matched with test subjects
+load('output/test-retest_match_id.mat');
+
+% first retest matrix corresponds to the 21st matrix in the test data
+loc(1)
+
+% compare the sum of permutation matrices between (retest 1st - test 21st)
+retest_1 = load(strcat('output/matching_results/P_retest_1_', penalty, '.mat'));
+sum_swaps = retest_1.sum_swaps;
+P_retest_1 = full(sparse(sum_swaps(:, 1), sum_swaps(:, 2), sum_swaps(:, 3), p, p));
+
+test_21 = load(strcat('output/matching_results/P_retest_21_', penalty, '.mat'));
+sum_swaps = test_21.sum_swaps;
+P_test_21 = full(sparse(sum_swaps(:, 1), sum_swaps(:, 2), sum_swaps(:, 3), p, p));
+
+% difference between retest 1st and test 21st
+matched_pair_diff = norm(P_retest_1 - P_test_21, 'fro')
+
+% compare the sum of permutation matrices between (retest 1st - retest 2nd-41st)
+mismatched_pair_diff = zeros(1, 997);
+for i = 1:997
+    test_i = load(strcat('output/matching_results/P_test_', num2str(i) ,'_', penalty, '.mat'));
+    sum_swaps = test_i.sum_swaps;
+    P_test_i = full(sparse(sum_swaps(:, 1), sum_swaps(:, 2), sum_swaps(:, 3), p, p));
+    mismatched_pair_diff(1, i) = norm(P_retest_1 - P_test_i, 'fro');
+end
+
+mean(mismatched_pair_diff)
+std(mismatched_pair_diff)
+
+% diff(retest_1, test_21) is smaller than the average of diff(retest_1,
+% test_i), i=1,...,997
+% This is an example of how test-retest pair tends to have permutaiton
+% matrices that are more similar than the unrelated pair.
