@@ -1,4 +1,4 @@
-function [P_old, diff, obj, new_m] = iterative_procedure(m1, m2, n_iter, lambda, penalty_m)
+function [P_old, diff, obj, new_m, cost_m] = iterative_procedure(m1, m2, n_iter, lambda, penalty_m)
 % match two maps using the iterative procedure, with possile regularization by penalizing certain matches
 % Arguments:
 %   m1: map 1
@@ -44,3 +44,6 @@ function [P_old, diff, obj, new_m] = iterative_procedure(m1, m2, n_iter, lambda,
     % toc
 
     new_m = P_old' * m1 * P_old;
+    
+    % new: evaluate the cost matrix used in the Hungarian algorithm
+    cost_m = m1' * P_old * m2 - lambda * penalty_m
