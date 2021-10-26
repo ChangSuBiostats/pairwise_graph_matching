@@ -50,6 +50,8 @@ n = size(test.subj, 2);
     offdiag_swap_counts = zeros(3,1); ;
     % 2) array of permutation matrices 
     cost_m_array = zeros(392, 392, 3);
+    % 3) extract four FC maps
+    FC_sub = test.C([1,2,3,997], :, :);
     
     inds = [2,3,n];
     for i = 1:3
@@ -61,3 +63,5 @@ n = size(test.subj, 2);
     end
     
     save('output/Fig1/cost_m_1-2_3_997.mat', 'cost_m_array');
+    save('output/Fig1/FC_1-2_3_997.mat', 'FC_sub');
+    
