@@ -56,7 +56,7 @@ function [P_old, diff, obj, new_m, cost_m, sum_swaps] = iterative_procedure(m1, 
     % toc
     
     if iter > n_iter
-        fprintf('Iterative proceure did not converge in %i iterations.', i_ref)    
+        fprintf('Iterative proceure did not converge in %i iterations.', iter)    
     end
 
     new_m = P_old' * m1 * P_old;

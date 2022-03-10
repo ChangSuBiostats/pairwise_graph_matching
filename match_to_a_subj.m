@@ -35,7 +35,7 @@ function []=match_to_a_subj(i_ref, lambda, penalty, data_path, ref_popu, n_iter)
 %       offdiag_swap_counts_by_iter: (997, n_iter+1), number of swaps across iterations
 %
 % Examples:
-%   matlab -nodisplay -nodesktop -r "match_to_a_subj(1,3e-4,'two_region', \
+%   matlab -nodisplay -nodesktop -r "match_to_a_subj(1,3e-4,'yeo', \
 %   '/Users/chang/Documents/research/brain_connectivity/data/precision/', 'test', 1)"
 %
 % Author:      Chang Su

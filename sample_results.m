@@ -19,9 +19,15 @@ p = 392;
 j = 10;
 P_to_10 = full(sparse(swap_positions(j, :, 1),swap_positions(j, :, 2), 1, p, p));
 
+% number of swaps
+sum(abs(P_to_10 - diag(repelem(1,392))), 'all')
+allOnes = reshape(repelem(1,392), 392, 1);
+sum(allOnes - diag(P_to_10))
 % recover the sum of permutation matrices across matching to subject 1-997
 P_sum=full(sparse(sum_swaps(:, 1), sum_swaps(:, 2), sum_swaps(:, 3), p, p));
 
+all392 = reshape(repelem(996,392), 392, 1);
+sum(all392 - diag(P_sum))
 %% sanity check on the computed results: visualize the permutation matrices
 
 % load ordering of yeo mapping
