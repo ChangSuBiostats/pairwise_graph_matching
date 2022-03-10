@@ -1,4 +1,4 @@
-function []=match_to_a_subj(i_ref, lambda, penalty, data_path, ref_popu)
+function []=match_to_a_subj(i_ref, lambda, penalty, data_path, ref_popu, n_iter)
 %DOCFUN match a selected subject to all 997 subjects 
 %
 % Perform matching with precision FC maps
@@ -17,6 +17,8 @@ function []=match_to_a_subj(i_ref, lambda, penalty, data_path, ref_popu)
 %       cc400_regFCprec_concat_hpf_retest41.mat
 %   ref_popu: which population does the reference matrix come from, i.e.
 %       test or re-test. Default to test.
+%   n_iter: maximum number of iterations to run; stops when the stopping
+%       rule is met
 %
 % OUTPUT
 %   a matlab file at output/matching_results/, named 'P_%i.mat' % i_ref,
@@ -29,10 +31,12 @@ function []=match_to_a_subj(i_ref, lambda, penalty, data_path, ref_popu)
 %       diff: (997,2), squared F-norm of the difference between two maps before and
 %           after matching
 %       offdiag_swap_counts: (997,1), number of offdiag swaps
+%       obj: (997, n_iter+1), objective function across iterations
+%       offdiag_swap_counts_by_iter: (997, n_iter+1), number of swaps across iterations
 %
 % Examples:
 %   matlab -nodisplay -nodesktop -r "match_to_a_subj(1,3e-4,'two_region', \
-%   '/Users/chang/Documents/research/brain_connectivity/data/precision/')"
+%   '/Users/chang/Documents/research/brain_connectivity/data/precision/', 'test', 1)"
 %
 % Author:      Chang Su
 % email:        c.su@yale.edu
@@ -47,9 +51,10 @@ function []=match_to_a_subj(i_ref, lambda, penalty, data_path, ref_popu)
         penalty (1,:) char {mustBeMember(penalty,{'vanilla','two_region','yeo'})} = 'yeo'
         data_path (1,:) char = 'data/'
         ref_popu (1,:) char = 'test'
+        n_iter (1,1) {mustBeNumeric,mustBeReal} = 1
     end
     
-    fprintf('i_ref=%i, lambda=%.1e, penalty=%s, data_path=%s , ref_popu=%s\n', i_ref, lambda, penalty, data_path, ref_popu)    
+    fprintf('i_ref=%i, lambda=%.1e, penalty=%s, data_path=%s , ref_popu=%s, n_iter=%i \n', i_ref, lambda, penalty, data_path, ref_popu, n_iter)    
     
     %% set up paths and directories
     % add the path where data are stored
@@ -91,18 +96,22 @@ function []=match_to_a_subj(i_ref, lambda, penalty, data_path, ref_popu)
     end
     m_ref(logical(eye(392))) = 0; % remove the effect of diagonal values
     
-    % set number of iterations to 1 to save computational time
-    n_iter = 1;
+    % set number of iterations to 1 to save computational cost
+    % n_iter = 1;
     
     % keep track of
     % 1) the position of nonzero entries in the permutation matrix
     swap_positions = zeros(n, 392, 2);
     % 2) difference between two matrices before and after permutation
-    diff = zeros(n,2); 
+    diff = zeros(n,n_iter+1); 
     % 3) number of off diagonal swaps
     offdiag_swap_counts = zeros(n,1); 
     % 4) array of permutation matrices 
     P_array = zeros(392, 392, n);
+    % 5) objective functions
+    obj = zeros(n,n_iter+1);
+    % 6) sum of swaps
+    offdiag_swap_counts_by_iter = zeros(n, n_iter+1);
     
     % Loop through all pairs 
     % Though the computation is redundant (some pairs might have been
@@ -111,9 +120,11 @@ function []=match_to_a_subj(i_ref, lambda, penalty, data_path, ref_popu)
     for i = 1:n
         m2 = squeeze(test.C(i, :, :));
         m2(logical(eye(392))) = 0;
-        [P, d, ~, ~] = iterative_procedure(m_ref, m2, n_iter, lambda, penalty_m);
+        [P, d, ob, ~, ~, ss] = iterative_procedure(m_ref, m2, n_iter, lambda, penalty_m);
         diff(i,:) = d;
+        obj(i,:) = ob;
         offdiag_swap_counts(i) = 392 - sum(P(logical(eye(392))));
+        offdiag_swap_counts_by_iter(i,:) = ss;
         [row, col, ] = find(P);
         % temporarily store the permutation matrices
         P_array(:, :, i) = P;
@@ -125,7 +136,7 @@ function []=match_to_a_subj(i_ref, lambda, penalty, data_path, ref_popu)
     % the positions and values of nonzero entries
     sum_swaps = [row, col, v];
 
-    save(strcat('output/matching_results/P_', ref_popu, '_', num2str(i_ref), '_', penalty, '.mat'), 'swap_positions', 'sum_swaps', 'diff', 'offdiag_swap_counts');
+    save(strcat('output/matching_results/P_', ref_popu, '_', num2str(i_ref), '_', penalty, '.mat'), 'swap_positions', 'sum_swaps', 'diff', 'offdiag_swap_counts', 'obj', 'offdiag_swap_counts_by_iter');
 end
 
 % reference: 
