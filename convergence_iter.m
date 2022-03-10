@@ -12,9 +12,9 @@ addpath '/Users/chang/Documents/research/brain_connectivity/pairwise_matching'
 % run the iterative procedure for 10 iterations
 n_iter = 20;
 i_subj = 1;
-match_to_a_subj(i_subj,3e-4,'two_region', '/Users/chang/Documents/research/brain_connectivity/data/precision/', 'test', n_iter);
+match_to_a_subj(i_subj,3e-4,'yeo', '/Users/chang/Documents/research/brain_connectivity/data/precision/', 'test', n_iter);
 
-load('output/matching_results/P_test_1_two_region_fixed_iter.mat')
+load('output/matching_results/P_test_1_yeo_fixed_iter.mat')
 
 % set convergence: epsilon = 0.01
 % obj_{t} - obj_{t-1} < epsilon
