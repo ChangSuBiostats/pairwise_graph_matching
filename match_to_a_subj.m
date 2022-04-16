@@ -10,8 +10,11 @@ function []=match_to_a_subj(i_ref, lambda, penalty, data_path, ref_popu, n_iter)
 %   lambda: weight for the penalty. Default to 3e-4.
 %   penalty: name of the penalty matrix. Currently we support 'vanilla'
 %       (penalizing all swaps), 'two_region' (penalizing only interactions across
-%       two hclust blocks) and 'yeo' (penalizing blocks within and between
-%       Limbic, subcortical and cerebellum). Default to 'two_region'.
+%       two hclust blocks), 'yeo' (penalizing blocks within and between
+%       Limbic, subcortical and cerebellum), 'yeo_all_pairs' (penalizing
+%       all pairs that have at least one region in the Limbic, subcortical
+%       or cerebellum networks under the yeo mapping. Default to
+%       'yeo_all_pairs'
 %   data_path: the path to HCP precision matrices 
 %       cc400_regFCprec_concat_hpf_997subj.mat
 %       cc400_regFCprec_concat_hpf_retest41.mat
@@ -48,7 +51,7 @@ function []=match_to_a_subj(i_ref, lambda, penalty, data_path, ref_popu, n_iter)
     arguments
         i_ref (1,1) {mustBeNumeric,mustBeReal} = 1
         lambda (1,1) {mustBeNumeric,mustBeReal} = 3e-4
-        penalty (1,:) char {mustBeMember(penalty,{'vanilla','two_region','yeo'})} = 'yeo'
+        penalty (1,:) char {mustBeMember(penalty,{'vanilla','two_region','yeo', 'yeo_all_pairs'})} = 'yeo_all_pairs'
         data_path (1,:) char = 'data/'
         ref_popu (1,:) char = 'test'
         n_iter (1,1) {mustBeNumeric,mustBeReal} = 1
@@ -86,6 +89,10 @@ function []=match_to_a_subj(i_ref, lambda, penalty, data_path, ref_popu, n_iter)
         penalty_m = load('output/two_regions_penalty.mat').two_region_p;
     elseif strcmp(penalty, 'yeo')
         penalty_m = load('output/yeo_penalty.mat').yeo_p;
+    elseif strcmp(penalty, 'null')
+        penalty_m = load('output/null_penalty.mat').null_p;
+    elseif strcmp(penalty, 'yeo_all_pairs')
+        penalty_m = load('output/yeo_all_pairs_penalty.mat').yeo_all_pairs;
     end    
     
     % set the FC map from subj i in ref_popu as the reference map
