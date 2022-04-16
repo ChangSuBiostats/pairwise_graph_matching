@@ -37,6 +37,8 @@ for i = 1:41
     P_same_sum = P_same{1, i} + P_same_sum;
 end
 
+save('output/matching_results/test_retest_no_penalty_sum_swaps.mat', 'P_same_sum');
+
 %% visualize swap count matrix
 % load Yeo mapping for re-ordering genes
 yeo_mapping = load('output/yeo_index.mat');
@@ -50,7 +52,6 @@ plot_heatmap(P_same_sum(yeo_mapping.re_index, yeo_mapping.re_index), [0 1], redm
 
 plot_heatmap(P_same_sum(yeo_mapping.re_index, yeo_mapping.re_index), [0 41], redmap, ...
     'Test-retest matching (in 41)', yeo_mapping.cluster_count, true(1));
-
 
 %% other exploration
 % check number of iterates it takes to converge
