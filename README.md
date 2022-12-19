@@ -1,6 +1,11 @@
 # Pairwise Graph Matching
 Codes for matching all HCP precision FC maps to one another using Hungarian algorithm.
 
+## Reference
+**A graph-matching based metric of functional connectome distance between pairs of individuals varies with their ages, cognitive performances and familial relationships**.
+Hussain Bukhari, Chang Su, Elvisha Dhamala, Zijin Gu, Keith Jamison, Amy Kuceyeski.
+bioRxiv 2022.10.03.510660; doi: https://doi.org/10.1101/2022.10.03.510660
+
 ## Functions
 1. Graph matching algorithm: iterative_procedure.m
 2. Matching one subject to all test subjects in HCP data: match_to_a_subj.m
